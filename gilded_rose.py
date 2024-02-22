@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-
+from aged_brie_strategy import AgedBrieStrategy
+from sulfur_as_strategy import SulfurasStrategy
+from backstage_passes_strategy import BackstagePassesStrategy
+from default_strategy import DefaultStrategy
+from typing import List
 
 class Item:
     """ DO NOT CHANGE THIS CLASS!!!"""
@@ -14,36 +18,16 @@ class Item:
 
 class GildedRose(object):
 
-    def __init__(self, items: list[Item]):
+    def __init__(self, items: List[Item]):
         # DO NOT CHANGE THIS ATTRIBUTE!!!
         self.items = items
+        self.strategy_map = {
+            "Aged Brie": AgedBrieStrategy(),
+            "Sulfuras, Hand of Ragnaros": SulfurasStrategy(),
+            "Backstage passes to a TAFKAL80ETC concert": BackstagePassesStrategy()
+        }
 
     def update_quality(self):
         for item in self.items:
-            if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert":
-                if item.quality > 0:
-                    if item.name != "Sulfuras, Hand of Ragnaros":
-                        item.quality = item.quality - 1
-            else:
-                if item.quality < 50:
-                    item.quality = item.quality + 1
-                    if item.name == "Backstage passes to a TAFKAL80ETC concert":
-                        if item.sell_in < 11:
-                            if item.quality < 50:
-                                item.quality = item.quality + 1
-                        if item.sell_in < 6:
-                            if item.quality < 50:
-                                item.quality = item.quality + 1
-            if item.name != "Sulfuras, Hand of Ragnaros":
-                item.sell_in = item.sell_in - 1
-            if item.sell_in < 0:
-                if item.name != "Aged Brie":
-                    if item.name != "Backstage passes to a TAFKAL80ETC concert":
-                        if item.quality > 0:
-                            if item.name != "Sulfuras, Hand of Ragnaros":
-                                item.quality = item.quality - 1
-                    else:
-                        item.quality = item.quality - item.quality
-                else:
-                    if item.quality < 50:
-                        item.quality = item.quality + 1
+            strategy = self.strategy_map.get(item.name, DefaultStrategy())
+            strategy.update(item)
